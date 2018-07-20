@@ -7,14 +7,6 @@ import (
 
 type callBackFunc func()
 
-// 状态接口
-type IFSMState interface {
-	Enter()
-	Do()
-	Exit()
-	CheckTransition()
-}
-
 // State父struct
 type FSMState struct {
 	id       string
@@ -50,10 +42,15 @@ func (this *FSMState) CheckTransition() {
 }
 
 /*******************************************************************************************/
+func CreateFSM() *FSM {
+	it := &FSM{}
+	it.Init()
+	return it
+}
 
 type FSM struct {
 	// 持有状态集合
-	states map[string]FSMState
+	statesMap map[string]FSMState
 	//
 	action *list.List
 	// 当前状态
@@ -69,6 +66,8 @@ type FSM struct {
 func (this *FSM) Init() {
 	//
 	this.runState = 0
+	this.statesMap = make(map[string]FSMState)
+	this.action = list.New()
 }
 
 func (this *FSM) Start() {
@@ -80,14 +79,12 @@ func (this *FSM) Start() {
 
 // 设置默认的State
 func (this *FSM) SetDefaultState(state FSMState) {
-	//
 	this.default_state = state
 }
 
 // 添加状态到FSM
 func (this *FSM) AddState(key string, state FSMState) {
-	//
-	this.states[key] = state
+	this.statesMap[key] = state
 	this.action.PushBack(key)
 }
 
@@ -108,7 +105,7 @@ func (this *FSM) SwitchFsmState() {
 	}
 	this.current_state = this.next_state
 	var index string = this.CalcNextStateKey(this.current_state)
-	this.next_state = this.states[index]
+	this.next_state = this.statesMap[index]
 }
 
 func (this *FSM) CalcNextStateKey(current FSMState) string {
@@ -135,5 +132,5 @@ func (this *FSM) ResetStateMachine() {
 	this.current_state = this.default_state
 	// 下一个状态
 	var index string = this.CalcNextStateKey(this.current_state)
-	this.next_state = this.states[index]
+	this.next_state = this.statesMap[index]
 }
