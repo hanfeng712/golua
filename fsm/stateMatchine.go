@@ -5,12 +5,21 @@ import (
 	"fmt"
 )
 
-type callBackFunc func()
+type callBackFunc func(arg interface{})
 
 // State父struct
 type FSMState struct {
 	id       string
 	callback callBackFunc
+	arg      interface{}
+}
+
+func CreateMatchineState(id string, fun callBackFunc, arg interface{}) FSMState {
+	return FSMState{
+		id:       id,
+		callback: fun,
+		arg:      arg,
+	}
 }
 
 // 进入状态
@@ -21,8 +30,8 @@ func (this *FSMState) Enter() {
 
 //状态处理函数
 func (this *FSMState) Do() {
-	fmt.Println("state do")
-	this.callback()
+	fmt.Printf("FSMState do - key : %s", this.id)
+	this.callback(this.arg)
 }
 
 // 退出状态
@@ -71,10 +80,20 @@ func (this *FSM) Init() {
 }
 
 func (this *FSM) Start() {
+	fmt.Printf("FSM-Start():enter")
 	if this.action.Len() == 0 {
+		fmt.Printf("FSM-Start():leave1")
 		return
 	}
+	firstKey := this.action.Front()
+	this.current_state = this.statesMap[firstKey.Value.(string)]
+	var index string = this.CalcNextStateKey(this.current_state)
+	this.next_state = this.statesMap[index]
+	this.default_state = this.statesMap[firstKey.Value.(string)]
+
 	this.runState = 1
+	this.SwitchFsmState()
+	fmt.Printf("FSM-Start():leave2")
 }
 
 // 设置默认的State
@@ -103,9 +122,13 @@ func (this *FSM) SwitchFsmState() {
 	if this.runState != 1 {
 		return
 	}
+	//执行当前状态的动作
+	this.current_state.Do()
+
 	this.current_state = this.next_state
 	var index string = this.CalcNextStateKey(this.current_state)
 	this.next_state = this.statesMap[index]
+	this.SwitchFsmState()
 }
 
 func (this *FSM) CalcNextStateKey(current FSMState) string {
