@@ -7,7 +7,7 @@ import (
 
 type callBackFunc func(arg interface{})
 
-// State父struct
+// State父struct-1
 type FSMState struct {
 	id       string
 	callback callBackFunc
