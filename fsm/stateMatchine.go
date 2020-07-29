@@ -6,8 +6,8 @@ import (
 )
 
 type callBackFunc func(arg interface{})
-//master-1111111111111
-//master-2222222222
+//branch-33333333333333
+//branch-4444444444444444444444
 // State父struct-3
 //-----
 type FSMState struct {
