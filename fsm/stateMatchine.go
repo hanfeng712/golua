@@ -9,7 +9,7 @@ type callBackFunc func(arg interface{})
 //master-1111111111111
 //master-2222222222
 // State父struct-3
-//-----
+//-----hanfeng712/master
 type FSMState struct {
 	id       string
 	callback callBackFunc
